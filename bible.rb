@@ -2,28 +2,27 @@
 #                /usr/local/Library/Contributions/example-formula.rb
 # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 require 'tmpdir'
+require 'fileutils'
 
 class Bible < Formula
   homepage "https://github.com/dtjm/bible"
-  url "https://github.com/dtjm/bible"
-  sha1 "923bf747f0a90011be27f1a423aa66db2464e1c2"
-  version "0.0.4"
+  url "https://github.com/dtjm/bible.git"
+  version "HEAD"
 
-  # depends_on "cmake" => :build
-  depends_on "go" # if your formula requires any X11/XQuartz components
+  depends_on "go" => :build
   depends_on "portaudio"
   depends_on "mpg123"
 
   def install
-    # ENV.deparallelize  # if your formula fails when building in parallel
-
     Dir.mktmpdir('gopath') {|dir|
+      FileUtils.mkpath "#{dir}/src/github.com/dtjm"
       puts "GOPATH=#{dir}"
-      puts "PATH=#{ENV['PATH']}"
-      ENV['PATH'] = "/usr/local/bin:#{ENV['PATH']}"
-      ENV['GOPATH'] = dir
+      ENV['PATH'] = "#{HOMEBREW_PREFIX}/bin:#{ENV['PATH']}"
+      ENV['GOPATH'] = "#{dir}:#{dir}/src/github.com/dtjm/bible/Godeps/_workspace"
       ENV['GOBIN'] = "#{dir}/bin"
-      system "go", "get", "-v", "github.com/dtjm/bible"
+
+      File.symlink buildpath, "#{dir}/src/github.com/dtjm/bible"
+      system "go", "install", "-v", "github.com/dtjm/bible"
       bin.install "#{dir}/bin/bible"
     }
   end
