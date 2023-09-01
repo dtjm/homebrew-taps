@@ -22,7 +22,7 @@ class Bible < Formula
       ENV['GOBIN'] = "#{dir}/bin"
 
       File.symlink buildpath, "#{dir}/src/github.com/dtjm/bible"
-      system "go", "install", "-v", "github.com/dtjm/bible"
+      system "go", "install", "-v", "github.com/dtjm/bible@latest"
       bin.install "#{dir}/bin/bible"
     }
   end
